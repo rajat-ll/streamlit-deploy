@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # This line allows the workflow to be triggered manually via API
+  workflow_dispatch:  # Allows the workflow to be triggered manually via API
 
 jobs:
   deploy:

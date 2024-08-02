@@ -28,7 +28,7 @@ session = PromptSession(history=FileHistory('commit_message_history.txt'),
 
 def push_first():
     if os.getenv("CI"):
-        # Running in a CI environments
+        # Running in a CI environment
         commit_message = os.getenv("COMMIT_MESSAGE", "Automated commit")
     else:
         commit_message = session.prompt("Enter commit message: ")
