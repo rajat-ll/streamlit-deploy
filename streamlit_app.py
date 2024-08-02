@@ -7,7 +7,7 @@ import pandas as pd
 session = get_active_session()
 
 # Write directly to the app
-st.title("working on deployment")
+st.title("Working on deployment")
 
 # query = "SELECT * FROM LL_PROD_RAW_ZONE.PUBLIC.EXTRA_TABLES;"
 # df = pd.DataFrame(session.sql(query).collect())
