@@ -24,7 +24,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas snowflake-connector-python streamlit numpy pyyaml snowflake-snowpark-python python-dotenv prompt_toolkit requests
 
+      - name: Check for Automated Commit
+        id: check_commit
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MESSAGE"
+          if [[ "$COMMIT_MESSAGE" == "Automated commit" ]]; then
+            echo "Automated commit detected. Skipping deployment."
+            exit 0
+          fi
+
       - name: Deploy to Snowflake
+        if: steps.check_commit.outputs.COMMIT_MESSAGE != 'Automated commit'
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
