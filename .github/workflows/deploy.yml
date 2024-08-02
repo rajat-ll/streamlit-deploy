@@ -28,10 +28,10 @@ jobs:
         id: check_commit
         run: |
           COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Deploy to Snowflake
-        if: ${{ env.commit_message != 'Automated commit' }}
+        if: env.COMMIT_MESSAGE != 'Automated commit'
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
