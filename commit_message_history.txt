@@ -73,3 +73,6 @@
 
 # 2024-08-02 15:26:45.577457
 +added secret to github 
+
+# 2024-08-02 15:35:19.548674
++changed the app location
