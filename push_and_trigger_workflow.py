@@ -27,6 +27,7 @@ session = PromptSession(history=FileHistory('commit_message_history.txt'),
                         completer=HistoryCompleter())
 
 def push_first():
+    print("Checking for changes to commit...")
     if os.getenv("CI"):
         # Running in a CI environment
         commit_message = os.getenv("COMMIT_MESSAGE", "Automated commit")
@@ -36,13 +37,17 @@ def push_first():
     try:
         # Check for changes
         result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+        print(f"Git status result: {result.stdout.strip()}")
         if not result.stdout.strip():
             print("No changes to commit.")
             return
 
+        print("Adding changes to git...")
         subprocess.run(["git", "add", "."], check=True)
+        print("Committing changes...")
         result = subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
         print(result.stdout)
+        print("Pushing changes to remote repository...")
         subprocess.run(["git", "push"], check=True)
         print("Git push successful.")
     except subprocess.CalledProcessError as e:
@@ -50,6 +55,7 @@ def push_first():
         exit(1)
 
 def trigger_workflow():
+    print("Loading environment variables from .env file...")
     load_dotenv()
 
     SNOWFLAKE_ACCOUNT = os.getenv('SNOWFLAKE_ACCOUNT')
@@ -58,8 +64,15 @@ def trigger_workflow():
     SNOWFLAKE_ROLE = os.getenv('SNOWFLAKE_ROLE')
     GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 
+    print("Environment variables loaded:")
+    print(f"SNOWFLAKE_ACCOUNT: {SNOWFLAKE_ACCOUNT}")
+    print(f"SNOWFLAKE_USER: {SNOWFLAKE_USER}")
+    print(f"SNOWFLAKE_PASSWORD: {'***' if SNOWFLAKE_PASSWORD else 'Not Set'}")
+    print(f"SNOWFLAKE_ROLE: {SNOWFLAKE_ROLE}")
+    print(f"GITHUB_TOKEN: {'***' if GITHUB_TOKEN else 'Not Set'}")
+
     if not all([SNOWFLAKE_ACCOUNT, SNOWFLAKE_USER, SNOWFLAKE_PASSWORD, SNOWFLAKE_ROLE, GITHUB_TOKEN]):
-        print("Please set your credentials in the .env file.")
+        print("Error: Not all required environment variables are set.")
         return  # Exit the function instead of exiting the script
 
     REPO_OWNER = "rajat-ll"
@@ -75,8 +88,8 @@ def trigger_workflow():
     }
 
     print(f"Triggering workflow for {REPO_OWNER}/{REPO_NAME} at {url}")
-    print(f"Headers: {headers}")
-    print(f"Data: {data}")
+    print(f"Headers: {json.dumps(headers, indent=2)}")
+    print(f"Data: {json.dumps(data, indent=2)}")
 
     try:
         response = requests.post(url, headers=headers, data=json.dumps(data))
