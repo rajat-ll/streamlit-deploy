@@ -28,14 +28,10 @@ jobs:
         id: check_commit
         run: |
           COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MESSAGE"
-          if [[ "$COMMIT_MESSAGE" == "Automated commit" ]]; then
-            echo "Automated commit detected. Skipping deployment."
-            exit 0
-          fi
+          echo "::set-output name=commit_message::$COMMIT_MESSAGE"
 
       - name: Deploy to Snowflake
-        if: steps.check_commit.outputs.COMMIT_MESSAGE != 'Automated commit'
+        if: ${{ steps.check_commit.outputs.commit_message != 'Automated commit' }}
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
