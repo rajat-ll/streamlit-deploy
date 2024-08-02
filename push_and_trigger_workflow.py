@@ -1,8 +1,8 @@
 import os
-from dotenv import load_dotenv
 import requests
 import json
 import subprocess
+import snowflake.connector
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -54,9 +54,38 @@ def push_first():
         print(f"Error executing Git commands: {e}")
         exit(1)
 
+def deploy_to_snowflake():
+    print("Deploying to Snowflake...")
+    SNOWFLAKE_ACCOUNT = os.getenv('SNOWFLAKE_ACCOUNT')
+    SNOWFLAKE_USER = os.getenv('SNOWFLAKE_USER')
+    SNOWFLAKE_PASSWORD = os.getenv('SNOWFLAKE_PASSWORD')
+    SNOWFLAKE_ROLE = os.getenv('SNOWFLAKE_ROLE')
+
+    if not all([SNOWFLAKE_ACCOUNT, SNOWFLAKE_USER, SNOWFLAKE_PASSWORD, SNOWFLAKE_ROLE]):
+        print("Error: Snowflake environment variables are not set properly.")
+        return
+
+    try:
+        conn = snowflake.connector.connect(
+            user=SNOWFLAKE_USER,
+            password=SNOWFLAKE_PASSWORD,
+            account=SNOWFLAKE_ACCOUNT,
+            role=SNOWFLAKE_ROLE
+        )
+        cursor = conn.cursor()
+        print("Connected to Snowflake. Running SQL commands...")
+        # Example of running a simple query. Replace with your actual deployment commands.
+        cursor.execute("SELECT CURRENT_VERSION()")
+        result = cursor.fetchone()
+        print(f"Snowflake current version: {result[0]}")
+        cursor.close()
+        conn.close()
+        print("Snowflake deployment completed successfully.")
+    except Exception as e:
+        print(f"Snowflake deployment failed: {e}")
+
 def trigger_workflow():
-    print("Loading environment variables from .env file...")
-    load_dotenv()
+    print("Loading environment variables from GitHub Secrets...")
 
     SNOWFLAKE_ACCOUNT = os.getenv('SNOWFLAKE_ACCOUNT')
     SNOWFLAKE_USER = os.getenv('SNOWFLAKE_USER')
@@ -107,7 +136,9 @@ def trigger_workflow():
 def main():
     print("Starting push_first")
     push_first()
-    print("Finished push_first, now triggering workflow")
+    print("Finished push_first, now deploying to Snowflake")
+    deploy_to_snowflake()
+    print("Finished deploying to Snowflake, now triggering workflow")
     trigger_workflow()
     print("Finished triggering workflow")
 
