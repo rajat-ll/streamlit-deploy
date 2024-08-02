@@ -73,13 +73,23 @@ def trigger_workflow():
     data = {
         "ref": "main"
     }
-    response = requests.post(url, headers=headers, data=json.dumps(data))
 
-    if response.status_code == 204:
-        print("Workflow triggered successfully.")
-    else:
-        print(f"Failed to trigger workflow: {response.status_code}")
-        print(response.text)
+    print(f"Triggering workflow for {REPO_OWNER}/{REPO_NAME} at {url}")
+    print(f"Headers: {headers}")
+    print(f"Data: {data}")
+
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        print(f"Response status code: {response.status_code}")
+        print(f"Response text: {response.text}")
+
+        if response.status_code == 204:
+            print("Workflow triggered successfully.")
+        else:
+            print(f"Failed to trigger workflow: {response.status_code}")
+            print(response.text)
+    except requests.exceptions.RequestException as e:
+        print(f"Error triggering workflow: {e}")
 
 def main():
     print("Starting push_first")
