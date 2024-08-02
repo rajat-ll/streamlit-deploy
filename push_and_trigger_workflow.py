@@ -82,8 +82,11 @@ def trigger_workflow():
         print(response.text)
 
 def main():
+    print("Starting push_first")
     push_first()
+    print("Finished push_first, now triggering workflow")
     trigger_workflow()
+    print("Finished triggering workflow")
 
 if __name__ == "__main__":
     main()
