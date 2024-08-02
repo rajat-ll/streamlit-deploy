@@ -1,0 +1,36 @@
+name: Deploy to Streamlit on Snowflake
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # This line allows the workflow to be triggered manually via API
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas snowflake-connector-python streamlit numpy pyyaml snowflake-snowpark-python python-dotenv prompt_toolkit requests
+
+      - name: Deploy to Snowflake
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          COMMIT_MESSAGE: "Automated commit"
+        run: |
+          python push_and_trigger_workflow.py
