@@ -63,7 +63,7 @@ def trigger_workflow():
         return  # Exit the function instead of exiting the script
 
     REPO_OWNER = "rajat-ll"
-    REPO_NAME = "streamlit-snowflake-deploy"
+    REPO_NAME = "streamlit-deploy"
 
     url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/workflows/deploy.yml/dispatches"
     headers = {
